@@ -1,2 +1,3 @@
-# ci
-CI Templates
+# Task
+[Taskfile](https://github.com/tonobo/task) Templates.
+
