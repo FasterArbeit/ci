@@ -1,0 +1,16 @@
+version: '2'
+output: 'prefixed'
+
+vars:
+  CGO_ENABLED: 1
+  
+tasks:
+   bin:
+    desc: Build the cgo binary
+    cmds:
+      - go build -a -ldflags "-X {{.PATH}}/cmd.BuildDate={{.DATE}} -X {{.PATH}}/cmd.BuildVersion={{.VERSION}}" -o ci-build/{{.BINARY_NAME}}
+    vars:
+      DATE:
+        sh: date '+%Y-%m-%dT%H:%M:%S%z'
+      VERSION:
+        sh: git describe --tags || git describe --always
