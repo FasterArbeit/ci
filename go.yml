@@ -3,8 +3,6 @@ output: 'prefixed'
 
 vars:
   CGO_ENABLED: 0
-  PATH: ''
-  BINARY_NAME: ''
 
 tasks:
   all:
@@ -40,10 +38,10 @@ tasks:
   bin:
     desc: Build the go binary
     cmds:
-      - go build -a -ldflags "-X {{.PATH}}/cmd.BuildDate={{.DATE}} -X {{.PATH}}/cmd.BuildVersion={{.VERSION}} -extldflags '-static' -s -w" -o ci-build/{{.BINARY_NAME}}
+      - go build -a -ldflags "-X {{.PATH}}/main.BuildDate={{.DATE}} -X {{.PATH}}/main.BuildVersion={{.VERSION}} -extldflags '-static' -s -w" -o ci-build/{{.BINARY_NAME}}
     vars:
       DATE:
-        sh: date -Iseconds
+        sh: date '+%Y-%m-%dT%H:%M:%S%z'
       VERSION:
         sh: git describe --tags || git describe --always
   changelog:
@@ -77,8 +75,8 @@ tasks:
   generate-install-script:
     desc: Generate install script using https://github.com/goreleaser/godownloader
     cmds:
-      - godownloader --repo MarkusFreitag/changelogger -o install-changelogger.sh
-      - cp ./install-changelogger.sh ./docs/install.sh
+      - godownloader --repo {{.REPOSITORY_NAME}} -o install-{{.BINARY_NAME}}.sh
+      - cp ./install-{{.BINARY_NAME}}.sh ./docs/install.sh
   ci:
     desc: Run ci tasks
     cmds:
