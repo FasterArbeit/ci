@@ -1,0 +1,41 @@
+version: '2'
+output: 'prefixed'
+
+vars:
+  DATE: 
+    sh: date '+%Y-%m-%dT%H:%M:%S%z'
+  VERSION: 
+    sh: git describe 2>/dev/null|| git log --pretty=format:"%h"|head -n 1
+  TEST_SOURCE_FILES:
+    # The test suit has its own main function. Therefore the original has
+    # to be excluded from compilation.
+    # Get all source files expect the one with the binary which should be 
+    # placed in a source file named after the binary
+    sh: find source -name *.c ! -name {{.BINARY}}.c|tr "\n" " "
+
+tasks:
+  setup:
+   desc: Set up environment
+   cmds:
+    - mkdir -p ci-build/
+  bin:
+   desc: Build binary
+   deps: [setup]
+   cmds:
+    - gcc source/*.c -Wall -o ci-build/{{.BINARY}} -I include/ -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
+  debug:
+   desc: Build binary for debugging
+   deps: [setup]
+   cmds:
+    - gcc source/*.c -Wall -g -o ci-build/{{.BINARY}}.dbg -I include/ -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
+  test:
+   desc: Build and execute test binary
+   deps: [setup]
+   cmds:
+     - gcc {{.SOURCE_FILES}} test/*.c -g -Wall -o ci-build/{{.BINARY}}.test -I include -I test -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
+     - ci-build/{{.BINARY}}.test
+  clean:
+   desc: Clean up files of the build process
+   cmds:
+    - rm -rf ci-build/
+
