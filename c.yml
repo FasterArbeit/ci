@@ -22,20 +22,42 @@ tasks:
    desc: Build binary
    deps: [setup]
    cmds:
-    - gcc source/*.c -Wall -o ci-build/{{.BINARY}} -I include/ -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
+    - gcc source/*.c 
+          -Wall 
+          -o ci-build/{{.BINARY}} 
+          -I include/ {{.LIBRARIES}} 
+          -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
   debug:
    desc: Build binary for debugging
    deps: [setup]
    cmds:
-    - gcc source/*.c -Wall -g -o ci-build/{{.BINARY}}.dbg -I include/ -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
+    - gcc source/*.c 
+          -Wall -g 
+          -o ci-build/{{.BINARY}}.dbg 
+          -I include/ {{.LIBRARIES}} 
+          -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
   test:
    desc: Build and execute test binary
    deps: [setup]
    cmds:
-     - gcc {{.SOURCE_FILES}} test/*.c -g -Wall -o ci-build/{{.BINARY}}.test -I include -I test -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
+     - gcc {{.TEST_SOURCE_FILES}} test/*.c 
+       -Wall -g -o ci-build/{{.BINARY}}.test
+       -I include -I test {{.LIBRARIES}} 
+       -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
      - ci-build/{{.BINARY}}.test
   clean:
    desc: Clean up files of the build process
    cmds:
     - rm -rf ci-build/
-
+  lint:
+    desc: Run gcc's syntax-checker 
+    deps: [setup]
+    cmds:
+     - gcc source/*.c
+           -fsyntax-only
+           -I include/
+  ci:
+   desc: Lint and test
+   cmds:
+    - task: lint
+    - task: test
