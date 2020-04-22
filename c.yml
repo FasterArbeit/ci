@@ -24,7 +24,7 @@ tasks:
    cmds:
     - gcc source/*.c 
           -Wall 
-          -o ci-build/{{.BINARY}} 
+          -o ci-build/{{OS}}.{{.BINARY}} 
           -I include/ {{.LIBRARIES}} 
           -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
   debug:
@@ -33,7 +33,7 @@ tasks:
    cmds:
     - gcc source/*.c 
           -Wall -g 
-          -o ci-build/{{.BINARY}}.dbg 
+          -o ci-build/{{OS}}.{{.BINARY}}.dbg 
           -I include/ {{.LIBRARIES}} 
           -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
   test:
@@ -41,10 +41,10 @@ tasks:
    deps: [setup]
    cmds:
      - gcc {{.TEST_SOURCE_FILES}} test/*.c 
-       -Wall -g -o ci-build/{{.BINARY}}.test
+       -Wall -g -o ci-build/{{OS}}.{{.BINARY}}.test
        -I include -I test {{.LIBRARIES}} 
        -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
-     - ci-build/{{.BINARY}}.test
+     - ci-build/{{OS}}.{{.BINARY}}.test
   clean:
    desc: Clean up files of the build process
    cmds:
