@@ -6,12 +6,6 @@ vars:
     sh: date '+%Y-%m-%dT%H:%M:%S%z'
   VERSION: 
     sh: git describe 2>/dev/null|| git log --pretty=format:"%h"|head -n 1
-  TEST_SOURCE_FILES:
-    # The test suit has its own main function. Therefore the original has
-    # to be excluded from compilation.
-    # Get all source files expect the one with the binary which should be 
-    # placed in a source file named after the binary
-    sh: find source -name *.c ! -name {{.BINARY}}.c|tr "\n" " "
 
 tasks:
   setup:
@@ -45,6 +39,14 @@ tasks:
        -I include -I test {{.LIBRARIES}} 
        -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
      - ci-build/{{OS}}.{{.BINARY}}.test
+   var:
+    TEST_SOURCE_FILES:
+    # The test suit has its own main function. Therefore the original has
+    # to be excluded from compilation.
+    # Get all source files expect the one with the binary which should be 
+    # placed in a source file named after the binary
+    sh: find source -name *.c ! -name {{.BINARY}}.c|tr "\n" " "
+    
   clean:
    desc: Clean up files of the build process
    cmds:
