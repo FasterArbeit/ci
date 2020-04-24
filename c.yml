@@ -1,5 +1,6 @@
 version: '2'
 output: 'prefixed'
+expansions: 3
 
 vars:
   DATE: 
@@ -19,7 +20,7 @@ tasks:
     - gcc source/*.c 
           -Wall 
           -o ci-build/{{OS}}.{{.BINARY}} 
-          -I include/ {{.LIBRARIES}} 
+          -I include/ {{if .LIBRARIES}}{{.LIBRARIES}}{{end}} 
           -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
   debug:
    desc: Build binary for debugging
@@ -28,7 +29,7 @@ tasks:
     - gcc source/*.c 
           -Wall -g 
           -o ci-build/{{OS}}.{{.BINARY}}.dbg 
-          -I include/ {{.LIBRARIES}} 
+          -I include/ {{if .LIBRARIES}}{{.LIBRARIES}}{{end}}  
           -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
   test:
    desc: Build and execute test binary
@@ -36,7 +37,7 @@ tasks:
    cmds:
      - gcc {{.TEST_SOURCE_FILES}} test/*.c 
        -Wall -g -o ci-build/{{OS}}.{{.BINARY}}.test
-       -I include -I test {{.LIBRARIES}} 
+       -I include -I test {{if .LIBRARIES}}{{.LIBRARIES}}{{end}} 
        -DBUILD_DATE="\"{{.DATE}}\"" -DBUILD_VERSION="\"{{.VERSION}}\""
      - ci-build/{{OS}}.{{.BINARY}}.test
    var:
